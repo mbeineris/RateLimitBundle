@@ -1,0 +1,23 @@
+framework:
+    secret: test
+    test: ~
+    router:   { resource: "%kernel.root_dir%/config/routing.yml" }
+
+security:
+    providers:
+        in_memory: { memory: ~ }
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+mabe_rate_limit:
+    enabled: true
+    redis:
+        host: 127.0.0.1
+        database: 5
+    paths:
+        - path: /api/test
+          limit: 3
+          period: 5
+          identifier: ip

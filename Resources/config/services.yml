@@ -1,0 +1,13 @@
+services:
+    mabe_rate_limit.redis_client:
+        public: true
+        class: Redis
+        factory:  [Symfony\Component\Cache\Adapter\RedisAdapter, createConnection]
+        arguments:
+            - "%mabe_rate_limit.redis_dsn%"
+
+    mabe_rate_limit.listener:
+        class: Mabe\RateLimitBundle\EventListener\RateLimitListener
+        arguments: ["%mabe_rate_limit.paths%", "@security.token_storage", "@security.authorization_checker", "@mabe_rate_limit.redis_client", "%mabe_rate_limit.enabled%"]
+        tags:
+            - { name: kernel.event_subscriber }

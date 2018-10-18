@@ -1,0 +1,36 @@
+{
+  "name": "mabe/ratelimit-bundle",
+  "description": "This symfony bundle provides functionality to limit requests based on rate limits using Redis.",
+  "keywords": ["api", "rest", "limit api", "api quota", "symfony bundle"],
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/mbeineris/RateLimitBundle.git"
+    }
+  ],
+  "authors": [
+    {
+      "name": "Marius Beineris",
+      "email": "mariusbeineris@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^7.1",
+    "symfony/framework-bundle": "^3.0|^4.0"
+  },
+  "require-dev": {
+    "symfony/security-bundle": "^2.7|^3.0|^4.0",
+    "symfony/phpunit-bridge": "^4.1",
+    "symfony/http-kernel": "^4.1",
+    "symfony/browser-kit": "^4.1",
+    "symfony/yaml": "^4.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mabe\\RateLimitBundle\\": ""
+    },
+    "classmap": [ "Tests/App/TestKernel.php" ]
+  }
+}
