@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/mbeineris/RateLimitBundle.svg?branch=master)](https://travis-ci.org/mbeineris/RateLimitBundle) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # RateLimitBundle
 
-A light-weight bundle that limits request rate for given path.
+A light-weight symfony bundle that limits request rate for given path.
 
 Requirements
 ============
