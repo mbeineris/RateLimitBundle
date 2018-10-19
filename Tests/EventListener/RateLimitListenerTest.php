@@ -17,7 +17,7 @@ class RateLimitListenerTest extends WebTestCase
 {
     private $client;
     private $listener, $dispatcher, $request;
-    private $limit = 3;
+    private $limit = 5;
 
     protected function setUp()
     {
@@ -26,11 +26,15 @@ class RateLimitListenerTest extends WebTestCase
         $paths = array(
             array('path' => '/api/test', 'limit' => $this->limit, 'period' => 10, 'identifier' => 'ip'),
         );
+
+        $redisClient = $this->client->getContainer()->get('mabe_rate_limit.redis_client');
+        $redisClient->flushall();
+
         $this->listener = new RateLimitListener(
             $paths,
             $this->client->getContainer()->get('security.token_storage'),
             $this->client->getContainer()->get('security.authorization_checker'),
-            $this->client->getContainer()->get('mabe_rate_limit.redis_client'),
+            $redisClient,
             true
         );
         $this->dispatcher = new EventDispatcher();
@@ -54,7 +58,6 @@ class RateLimitListenerTest extends WebTestCase
             $this->createEvent()
         );
         $this->assertTrue(true);
-        $this->client->getContainer()->get('mabe_rate_limit.redis_client')->flushall();
     }
 
     public function testSpamRequest()
@@ -67,6 +70,5 @@ class RateLimitListenerTest extends WebTestCase
             );
         }
         $this->assertTrue(true);
-        $this->client->getContainer()->get('mabe_rate_limit.redis_client')->flushall();
     }
 }

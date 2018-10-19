@@ -3,6 +3,7 @@
 namespace Mabe\RateLimitBundle\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -13,7 +14,7 @@ use Redis;
 class RateLimitListener implements EventSubscriberInterface
 {
     private $storage;
-    public $pathRules;
+    private $pathRules;
     private $tokenStorage;
     private $authorizationChecker;
     private $enabled;
@@ -80,16 +81,41 @@ class RateLimitListener implements EventSubscriberInterface
                         }
                         break;
                 endswitch;
-                $redisClient->incr($key);
-                $redisClient->setTimeout($key, $rule['period']);
 
-                if ($redisClient->get($key) > $rule['limit']) {
+                $period = $rule['period'];
+                $limit = $rule['limit'];
+
+                $redisClient->incr($key);
+                $redisClient->setTimeout($key, $period);
+
+                if ($redisClient->get($key) > $limit) {
                     throw new HttpException(429, 'Too many requests');
                 }
+
+                $request = $event->getRequest();
+
+                $request->attributes->set('limit', $limit);
+                $request->attributes->set('period', $period);
+                $request->attributes->set('key', $key);
             }
         }
 
         return;
+    }
+
+    /**
+     * @param FilterResponseEvent $event
+     */
+    public function onKernelResponse(FilterResponseEvent $event)
+    {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+
+        $limit = $request->get('limit');
+
+        $response->headers->set('X-RateLimit-Limit', $limit);
+        $response->headers->set('X-RateLimit-Remaining', $limit - $this->storage->get($request->get('key')));
+        $response->headers->set('X-RateLimit-Reset', time() + $request->get('period'));
     }
 
     /**
@@ -99,6 +125,7 @@ class RateLimitListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::REQUEST => ['onKernelRequest', 256],
+            KernelEvents::RESPONSE => ['onKernelResponse', 256],
         );
     }
 
