@@ -23,9 +23,12 @@ class MabeRateLimitExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
-        $container->setParameter('mabe_rate_limit.paths', $config['paths']);
-        $container->setParameter('mabe_rate_limit.redis_dsn', 'redis://'.$config['redis']['host'].':'.$config['redis']['port'].'/'.$config['redis']['database']);
+
         $container->setParameter('mabe_rate_limit.enabled', $config['enabled']);
+        $container->setParameter('mabe_rate_limit.paths', $config['paths']);
+        if (!empty($config['redis'])) {
+            $container->setParameter('mabe_rate_limit.redis_dsn', 'redis://'.$config['redis']['host'].':'.$config['redis']['port'].'/'.$config['redis']['database']);
+            $loader->load('services.yml');
+        }
     }
 }
