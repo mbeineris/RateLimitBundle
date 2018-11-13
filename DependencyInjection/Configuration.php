@@ -23,7 +23,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('enabled')->defaultValue(true)->end()
-                ->arrayNode('redis')
+                ->arrayNode('redis')->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('host')->defaultValue('127.0.0.1')->end()
                         ->scalarNode('port')->defaultValue('6379')->end()
